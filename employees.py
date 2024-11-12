@@ -1,7 +1,7 @@
 from payroll import PayrollCalculator
 from productivity import ProductivitySystem
 from contacts import AddressBook
-from mydate import DateDatabase, MyDate
+from mydate import DateDatabase, MyDate, DateCalculation, AgeCalculation, DaysUntilPromotionCalculation, TenureCalculation
 from datetime import date
 
 class EmployeeDatabase:
@@ -57,4 +57,13 @@ class Employee:
     def date_until_promotion(self):
         today = MyDate(date.today().day, date.today().month, date.today().year)
         return self.promotion_date.date_difference(today)
-
+    
+    def calculate_dates(self, calculation: DateCalculation):
+        if isinstance(calculation, AgeCalculation):
+            return calculation.calculate(MyDate(date.today().day, date.today().month, date.today().year), self.birth_date)
+        elif isinstance(calculation, DaysUntilPromotionCalculation):
+            return calculation.calculate(MyDate(date.today().day, date.today().month, date.today().year), self.promotion_date)
+        elif isinstance(calculation, TenureCalculation):
+            return calculation.calculate(MyDate(date.today().day, date.today().month, date.today().year), self.hiring_date)
+        else:
+            return "Unsupported calculation"

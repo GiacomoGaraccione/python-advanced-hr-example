@@ -1,4 +1,5 @@
 from datetime import timedelta, date
+from abc import ABC, abstractmethod
 
 class DateDatabase:
     def __init__(self):
@@ -43,21 +44,13 @@ class DateDatabase:
         return date
     
     def display_dates(self, employees):
-        print("Hiring Dates:")
-        print("-------------")
+        print("Employee date info:")
+        print("===================")
         for employee in employees:
-            print(f"Employee ID: {employee.name}, Hiring Date: {self.get_hiring_date(employee.id)}")    
-        print()
-        print("Birth Dates:")
-        print("-------------")
-        for employee in employees:
-            print(f"Employee ID: {employee.name}, Birth Date: {self.get_birth_date(employee.id)}")
-        print()
-        print("Promotion Dates:")
-        print("-------------")
-        for employee in employees:
-            print(f"Employee ID: {employee.name}, Promotion Date: {self.get_promotion_date(employee.id)}, Days until promotion: {employee.date_until_promotion()}")
-        print()
+            print(f"Employee {employee.name} - {employee.calculate_dates(AgeCalculation())}")
+            print(f"Employee {employee.name} - {employee.calculate_dates(TenureCalculation())}")
+            print(f"Employee {employee.name} - {employee.calculate_dates(DaysUntilPromotionCalculation())}")
+        print("")
 
 
 
@@ -129,15 +122,28 @@ class MyDate:
         sep = getattr(self, 'print_sep', '-')
         print(self.format_date(self.day, self.month, self.year, sep))
 
-date1 = MyDate(1, 1, 2021)
-date2 = MyDate(15, 1, 2021)
-print(f"Difference in days: {date1.date_difference(date2)}")
+class DateCalculation(ABC):
+    @abstractmethod
+    def calculate(self, reference_date, target_date):
+        pass
 
-date1.increase_date(10)
-print(f"Date after increasing 10 days: {date1}")
-
-date1.decrease_date(5)
-print(f"Date after decreasing 5 days: {date1}")
-
-MyDate.set_print_format("/")
-date1.print_date()
+class AgeCalculation(DateCalculation):
+    def calculate(self, reference_date, birth_date):
+        years = reference_date.year - birth_date.year
+        if (reference_date.month, reference_date.day) < (birth_date.month, birth_date.day):
+            years -= 1
+        return f"Age: {years} years old"
+    
+class TenureCalculation(DateCalculation):
+    def calculate(self, reference_date, hiring_date):
+        years = reference_date.year - hiring_date.year
+        months = reference_date.month - hiring_date.month
+        if months < 0:
+            years -= 1
+            months += 12
+        return f"Tenure: {years} years and {months} months"
+    
+class DaysUntilPromotionCalculation(DateCalculation):
+    def calculate(self, reference_date, promotion_date):
+        days = promotion_date.date_difference(reference_date)
+        return f"Days until promotion: {days}"
