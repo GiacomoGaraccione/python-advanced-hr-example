@@ -1,29 +1,23 @@
 from datetime import timedelta, date
 from abc import ABC, abstractmethod
+import csv
 
 class DateDatabase:
-    def __init__(self):
-        self._hiring_dates = {
-            1: MyDate(1, 1, 2021),
-            2: MyDate(8, 6, 2022),
-            3: MyDate(11, 11, 2024),
-            4: MyDate(15, 3, 2023),
-            5: MyDate(20, 12, 2021),
-        }
-        self._birth_dates = {
-            1: MyDate(1, 1, 1990),
-            2: MyDate(8, 6, 1992),
-            3: MyDate(11, 11, 1994),
-            4: MyDate(15, 3, 1993),
-            5: MyDate(20, 12, 1991),
-        }
-        self._promotion_dates = {
-            1: MyDate(1, 1, 2025),
-            2: MyDate(8, 6, 2024),
-            3: MyDate(11, 11, 2025),
-            4: MyDate(15, 11, 2024),
-            5: MyDate(20, 12, 2026),
-        }
+    def __init__(self, dates_file='dates.csv'):
+        self._hiring_dates, self._birth_dates, self._promotion_dates = self._load_dates(dates_file)
+
+    def _load_dates(self, dates_file):
+        hiring_dates = {}
+        birth_dates = {}
+        promotion_dates = {}
+        with open(dates_file, newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                emp_id = int(row["id"])
+                hiring_dates[emp_id] = MyDate.from_string(row["hiring_date"])
+                birth_dates[emp_id] = MyDate.from_string(row["birth_date"])
+                promotion_dates[emp_id] = MyDate.from_string(row["promotion_date"])
+        return hiring_dates, birth_dates, promotion_dates
     
     def get_hiring_date(self, employee_id):
         date = self._hiring_dates.get(employee_id)
@@ -51,6 +45,82 @@ class DateDatabase:
             print(f"Employee {employee.name} - {employee.calculate_dates(TenureCalculation())}")
             print(f"Employee {employee.name} - {employee.calculate_dates(DaysUntilPromotionCalculation())}")
         print("")
+
+    def add_dates(self, employee_id, hiring_date, birth_date, promotion_date):
+        hd = MyDate.from_string(hiring_date)
+        bd = MyDate.from_string(birth_date)
+        pd = MyDate.from_string(promotion_date)
+        if not MyDate.is_valid_date(hd.day, hd.month, hd.year) or not MyDate.is_valid_date(bd.day, bd.month, bd.year) or not MyDate.is_valid_date(pd.day, pd.month, pd.year):
+            raise ValueError("Invalid date")
+        new_dates = {
+            "id": employee_id,
+            "hiring_date": hiring_date,
+            "birth_date": birth_date,
+            "promotion_date": promotion_date
+        }
+        with open('dates.csv', mode='a', newline='') as csvfile:
+            writer = csv.DictWriter(csvfile, fieldnames=["id", "hiring_date", "birth_date", "promotion_date"])
+            writer.writerow(new_dates)
+        print(f"Dates for Employee {employee_id} added successfully.")
+
+    def update_dates(self, employee_id, hiring_date=None, birth_date=None, promotion_date=None):
+        updated = False
+        dates = []
+
+        with open('dates.csv', newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if int(row["id"]) == employee_id:
+                    if hiring_date:
+                        hd = MyDate.from_string(hiring_date)
+                        if MyDate.is_valid_date(hd.day, hd.month, hd.year):
+                            row["hiring_date"] = hiring_date
+                        else:
+                            raise ValueError("Invalid hiring date")
+                    if birth_date:
+                        bd = MyDate.from_string(birth_date)
+                        if MyDate.is_valid_date(bd.day, bd.month, bd.year):
+                            row["birth_date"] = birth_date
+                        else:
+                            raise ValueError("Invalid birth date")
+                    if promotion_date:
+                        pd = MyDate.from_string(promotion_date)
+                        if MyDate.is_valid_date(pd.day, pd.month, pd.year):
+                            row["promotion_date"] = promotion_date
+                        else:
+                            raise ValueError("Invalid promotion date")
+                    updated = True
+                dates.append(row)
+
+        if updated:
+            with open('dates.csv', mode='w', newline='') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=["id", "hiring_date", "birth_date", "promotion_date"])
+                writer.writeheader()
+                writer.writerows(dates)
+            print(f"Dates for Employee {employee_id} updated successfully.")
+        else:
+            print(f"Dates for Employee {employee_id} not found.")
+
+    def delete_dates(self, employee_id):
+        deleted = False
+        dates = []
+
+        with open('dates.csv', newline='') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if int(row["id"]) != employee_id:
+                    dates.append(row)
+                else:
+                    deleted = True
+
+        if deleted:
+            with open('dates.csv', mode='w', newline='') as csvfile:
+                writer = csv.DictWriter(csvfile, fieldnames=["id", "hiring_date", "birth_date", "promotion_date"])
+                writer.writeheader()
+                writer.writerows(dates)
+            print(f"Dates for Employee {employee_id} deleted successfully.")
+        else:
+            print(f"Dates for Employee {employee_id} not found.")
 
 
 
@@ -126,6 +196,11 @@ class MyDate:
     def print_date(self):
         sep = getattr(self, 'print_sep', '-')
         print(self.format_date(self.day, self.month, self.year, sep))
+
+    @classmethod
+    def from_string(cls, date_string, sep= "-"):
+        year, month, day = map(int, date_string.split(sep))
+        return cls(day, month, year)
 
 class DateCalculation(ABC):
     @abstractmethod
