@@ -27,19 +27,19 @@ class DateDatabase:
     
     def get_hiring_date(self, employee_id):
         date = self._hiring_dates.get(employee_id)
-        if not date:
+        if date is None:
             raise ValueError("Invalid employee ID")
         return date
     
     def get_birth_date(self, employee_id):
         date = self._birth_dates.get(employee_id)
-        if not date:
+        if date is None:
             raise ValueError("Invalid employee ID")
         return date
     
     def get_promotion_date(self, employee_id):
         date = self._promotion_dates.get(employee_id)
-        if not date:
+        if date is None:
             raise ValueError("Invalid employee ID")
         return date
     
@@ -99,13 +99,18 @@ class MyDate:
         d2 = date(other.year, other.month, other.day)
         return (d1 - d2).days
     
-    def increase_date(self, days):
+    def __add__(self, days):
         d = date(self.year, self.month, self.day) + timedelta(days=days)
-        self.set_date(d.day, d.month, d.year)
+        return MyDate(d.day, d.month, d.year)
     
-    def decrease_date(self, days):
+    def __sub__(self, days):
         d = date(self.year, self.month, self.day) - timedelta(days=days)
-        self.set_date(d.day, d.month, d.year)
+        return MyDate(d.day, d.month, d.year)
+
+    def __bool__(self):
+        today = date.today()
+        current_date = date(self.year, self.month, self.day)
+        return current_date >= today
     
     def __str__(self):
         return self.format_date(self.day, self.month, self.year)
@@ -146,4 +151,8 @@ class TenureCalculation(DateCalculation):
 class DaysUntilPromotionCalculation(DateCalculation):
     def calculate(self, reference_date, promotion_date):
         days = promotion_date.date_difference(reference_date)
-        return f"Days until promotion: {days}"
+        if promotion_date:
+            return f"Days until promotion: {days}"
+        else:
+            return f"Employee was promoted {abs(days)} days ago"
+        
