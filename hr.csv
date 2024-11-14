@@ -1,0 +1,6 @@
+name,role,street,street2,city,state,zip_code,hiring_date,birth_date,promotion_date,policy,weekly_salary,hourly_rate,commission_per_sale
+Mary Poppins,manager,Corso Duca Degli Abruzzi,101,Turin,Italy,10100,2021-01-01,1990-01-01,2025-01-01,salary,3000,,
+John Smith,secretary,Via Roma,,Turin,Italy,10100,2022-06-08,1992-06-08,2024-06-08,salary,1500,,
+Kevin Bacon,sales,Via Po,,Turin,Italy,10100,2024-11-11,1994-11-11,2025-11-11,commission,1000,,250
+Jane Doe,factory,Via Garibaldi,,Turin,Italy,10100,2023-03-15,1993-03-15,2024-11-15,hourly,,15,
+Robbie Williams,secretary,Main Street,,Rome,Italy,10000,2022-01-01,1991-12-20,2026-12-20,commission,2000.0,,500.0

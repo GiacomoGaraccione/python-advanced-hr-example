@@ -4,20 +4,7 @@ import csv
 
 class DateDatabase:
     def __init__(self, dates_file='dates.csv'):
-        self._hiring_dates, self._birth_dates, self._promotion_dates = self._load_dates(dates_file)
-
-    def _load_dates(self, dates_file):
-        hiring_dates = {}
-        birth_dates = {}
-        promotion_dates = {}
-        with open(dates_file, newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                emp_id = int(row["id"])
-                hiring_dates[emp_id] = MyDate.from_string(row["hiring_date"])
-                birth_dates[emp_id] = MyDate.from_string(row["birth_date"])
-                promotion_dates[emp_id] = MyDate.from_string(row["promotion_date"])
-        return hiring_dates, birth_dates, promotion_dates
+        pass
     
     def get_hiring_date(self, employee_id):
         date = self._hiring_dates.get(employee_id)

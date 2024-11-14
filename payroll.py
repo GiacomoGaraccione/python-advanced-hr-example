@@ -1,23 +1,8 @@
 import csv
 
 class PayrollCalculator():
-    def __init__(self, policies_file="policies.csv"):
-        self._employee_policies = self._load_policies(policies_file)
-
-    def _load_policies(self, policies_file):
-        policies = {}
-        with open(policies_file, newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                emp_id = int(row["id"])
-                policy_type = row["policy"]
-                if policy_type == "salary":
-                    policies[emp_id] = SalaryPolicy(float(row["weekly_salary"]))
-                elif policy_type == "hourly":
-                    policies[emp_id] = HourlyPolicy(float(row["hourly_rate"]))
-                elif policy_type == "commission":
-                    policies[emp_id] = CommissionPolicy(float(row["weekly_salary"]), float(row["commission_per_sale"]))
-        return policies
+    def __init__(self):
+        pass
 
     def get_policy(self, employee_id):
         policy = self._employee_policies.get(employee_id)
@@ -33,6 +18,15 @@ class PayrollCalculator():
             if employee.address:
                 print(f"Sent to: {employee.address}")
         print("")
+
+    @classmethod
+    def create_policy(cls, policy_type, weekly_salary=None, hourly_rate=None, commission_per_sale=None):
+        if policy_type == "salary":
+            return SalaryPolicy(weekly_salary)
+        elif policy_type == "hourly":
+            return HourlyPolicy(hourly_rate)
+        elif policy_type == "commission":
+            return CommissionPolicy(weekly_salary, commission_per_sale)
 
     def add_policy(self, employee_id, policy_type, weekly_salary=None, hourly_rate=None, commission_per_sale=None):
         new_policy = {

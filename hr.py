@@ -5,12 +5,13 @@ from mydate import DateDatabase
 from contacts import AddressBook
 
 productivity_system = ProductivitySystem()
-payroll_system = PayrollCalculator("policies.csv")
-employee_database = EmployeeDatabase("employees.csv")
-date_database = DateDatabase("dates.csv")
-address_book = AddressBook("addresses.csv")
+payroll_system = PayrollCalculator()
+employee_database = EmployeeDatabase("hr.csv")
+date_database = DateDatabase()
+address_book = AddressBook()
 
 employees = employee_database.employees
+
 productivity_system.track(employees, 40)
 payroll_system.calculate_payroll(employees)
 date_database.display_dates(employees)

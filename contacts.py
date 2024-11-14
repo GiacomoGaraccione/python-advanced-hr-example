@@ -17,17 +17,7 @@ class Address():
     
 class AddressBook():
     def __init__(self, addresses_file="addresses.csv"):
-        self._employee_addresses = self._load_addresses(addresses_file)
-
-    def _load_addresses(self, addresses_file):
-        addresses = {}
-        with open(addresses_file, newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                addresses[int(row["id"])] = Address(
-                    row["street"], row["city"], row["state"], row["zip_code"], row.get("street2", "")
-                )
-        return addresses
+        pass
 
     def get_employee_address(self, employee_id):
         address = self._employee_addresses.get(employee_id)
