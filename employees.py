@@ -22,7 +22,7 @@ class EmployeeDatabase:
                 for row in reader:
                     operations.create_employee(row["name"], row["role"])
                     employee_id = operations.get_employee_by_name(row["name"]).id
-                operations.create_employee_address(employee_id, row["street"], row["city"], row["state"], row["zip_code"], row.get("street2", None))
+                    operations.create_employee_address(employee_id, row["street"], row["city"], row["state"], row["zip_code"], row.get("street2", None))
                     operations.create_employee_dates(employee_id, row["hiring_date"], row["birth_date"], row["promotion_date"])
                     operations.create_employee_policy(employee_id, row["policy"], row.get("weekly_salary", None), row.get("hourly_rate", None), row.get("commission_per_sale", None))
                 
