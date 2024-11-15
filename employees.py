@@ -68,63 +68,7 @@ class EmployeeDatabase:
     @property
     def employees(self):
         return self._employees
-    
-    def add_employee(self, employee_id, name, role):
-        new_employee = {"id": employee_id, "name": name, "role": role}
-        with open('employees.csv', mode='a', newline='') as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=["id", "name", "role"])
-            writer.writerow(new_employee)
-        print(f"Employee {employee_id} - {name} added successfully.")
 
-    def update_employee(self, employee_id, name=None, role=None):
-        updated = False
-        employees = []
-
-        with open('employees.csv', newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                if int(row["id"]) == employee_id:
-                    if name:
-                        row["name"] = name
-                    if role:
-                        if role in ["manager", "secretary", "sales", "factory"]:
-                            row["role"] = role
-                        else:
-                            raise ValueError("Invalid role")
-                    updated = True
-                employees.append(row)
-
-        if updated:
-            with open('employees.csv', mode='w', newline='') as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=["id", "name", "role"])
-                writer.writeheader()
-                writer.writerows(employees)
-            print(f"Employee {employee_id} updated successfully.")
-        else:
-            print(f"Employee {employee_id} not found.")
-
-    def delete_employee(self, employee_id):
-        deleted = False
-        employees = []
-
-        with open('employees.csv', newline='') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                if int(row["id"]) != employee_id:
-                    employees.append(row)
-                else:
-                    deleted = True
-
-        if deleted:
-            with open('employees.csv', mode='w', newline='') as csvfile:
-                writer = csv.DictWriter(csvfile, fieldnames=["id", "name", "role"])
-                writer.writeheader()
-                writer.writerows(employees)
-            print(f"Employee {employee_id} deleted successfully.")
-        else:
-            print(f"Employee {employee_id} not found.")
-    
-    
 class Employee:
     def __init__(self, id, name, address, role, payroll, hiring_date, birth_date, promotion_date):
         self.id = id

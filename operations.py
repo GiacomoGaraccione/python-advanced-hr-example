@@ -102,3 +102,98 @@ def get_employee_policy(employee_id):
     except NoResultFound:
         print(f"Policy for employee {employee_id} not found.")
         return None
+    
+def update_employee(employee_id, name=None, role=None):
+    session = get_session()
+    try:
+        employee = session.query(EmployeeModel).filter_by(id=employee_id).one()
+        if name:
+            employee.name = name
+        if role:
+            employee.role = role
+        session.commit()
+        print(f"Employee {employee_id} updated successfully.")
+    except NoResultFound:
+        print(f"Employee {employee_id} not found in the database.")
+
+def update_employee_dates(employee_id, hiring_date=None, birth_date=None, promotion_date=None):
+    session = get_session()
+    try:
+        dates = session.query(EmployeeDatesModel).filter_by(employee_id=employee_id).one()
+        if hiring_date:
+            hd = MyDate.from_string(hiring_date)
+            if not MyDate.is_valid_date(hd.day, hd.month, hd.year):
+                raise ValueError("Invalid hiring date")
+            dates.hiring_date = hiring_date
+        if birth_date:
+            bd = MyDate.from_string(birth_date)
+            if not MyDate.is_valid_date(bd.day, bd.month, bd.year):
+                raise ValueError("Invalid birth date")
+            dates.birth_date = birth_date
+        if promotion_date:
+            pd = MyDate.from_string(promotion_date)
+            if not MyDate.is_valid_date(pd.day, pd.month, pd.year):
+                raise ValueError("Invalid promotion date")
+            dates.promotion_date = promotion_date
+        session.commit()
+        print(f"Dates for Employee {employee_id} updated successfully.")
+    except NoResultFound:
+        print(f"Dates for Employee {employee_id} not found in the database.")
+
+def update_employee_address(employee_id, street=None, city=None, state=None, zip_code=None, street2=None):
+    session = get_session()
+    try:
+        address = session.query(AddressModel).filter_by(employee_id=employee_id).one()
+        if street:
+            address.street = street
+        if street2:
+            address.street2 = street2
+        if city:
+            address.city = city
+        if state:
+            address.state = state
+        if zip_code:
+            address.zip_code = zip_code
+        session.commit()
+        print(f"Address for Employee {employee_id} updated successfully.")
+    except NoResultFound:
+        print(f"Address for Employee {employee_id} not found in the database.")
+
+def update_employee_policy(employee_id, policy_type, weekly_salary=None, hourly_rate=None, commission_per_sale=None):
+    session = get_session()
+    try:
+        policy = session.query(PayrollPolicyModel).filter_by(employee_id=employee_id).one()
+        policy.policy = policy_type
+        if policy_type == "salary":
+            policy.weekly_salary = float(weekly_salary)
+            policy.hourly_rate = None
+            policy.commission_per_sale = None
+        if policy_type == "hourly":
+            policy.hourly_rate = float(hourly_rate)
+            policy.weekly_salary = None
+            policy.commission_per_sale = None
+        if policy_type == "commission":
+            policy.commission_per_sale = float(commission_per_sale)
+            policy.weekly_salary = float(weekly_salary)
+            policy.hourly_rate = None
+        session.commit()
+        print(f"Policy for Employee {employee_id} updated successfully.")
+    except NoResultFound:
+        print(f"Policy for Employee {employee_id} not found in the database.")
+
+
+def delete_employee(employee_id):
+    session = get_session()
+    try:
+        employee = session.query(EmployeeModel).filter_by(id=employee_id).one()
+        employee_address = session.query(AddressModel).filter_by(employee_id=employee_id).one()
+        employee_dates = session.query(EmployeeDatesModel).filter_by(employee_id=employee_id).one()
+        employee_policy = session.query(PayrollPolicyModel).filter_by(employee_id=employee_id).one()
+        session.delete(employee_policy)
+        session.delete(employee_dates)
+        session.delete(employee_address)
+        session.delete(employee)
+        session.commit()
+        print(f"Employee {employee_id} deleted successfully.")
+    except NoResultFound:
+        print(f"Employee {employee_id} not found in the database.")
